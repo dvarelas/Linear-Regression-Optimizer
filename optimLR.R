@@ -8,7 +8,29 @@ rest_mle <- function(y,
                      maxit = 5000,
                      trace = TRUE) {
   
-  # loglikelihood of a linear regression model
+  ## check if inputs are as expected
+  # initialValues
+  if(!is.null(initialValues)) {
+    if (length(initialValues) != (ncol(x)+1)) {
+      stop("Incorrect number of initial values")
+    }
+  }
+  
+  # restrictions (lower bound)
+  if(!is.null(restrictionsL)) {
+    if (length(restrictionsL) != (ncol(x)+1)) {
+      stop("Incorrect number of restrictions (Lower bound)")
+    }
+  }
+  
+  # restrictions (upper bound)
+  if(!is.null(restrictionsU)) {
+    if (length(restrictionsU) != (ncol(x)+1)) {
+      stop("Incorrect number of restrictions (Upper bound)")
+    }
+  }
+  
+  ## loglikelihood of a linear regression model
   loglik <- function(y,x,beta) {
     b0 <- beta[1]
     beta <- beta[-1]
@@ -18,7 +40,7 @@ rest_mle <- function(y,
     return(-ll)
   }
   
-  # define initial values
+  ## define initial values
   if (is.null(initialValues)) {
     ls <- lm(y~x)
     betaInit <- as.numeric(ls$coefficients)
@@ -45,6 +67,7 @@ rest_mle <- function(y,
   
   x <- as.matrix(x)
   
+  ## optimization
   rmle <- optim(betaInit,
                 loglik, x = x, y = y, 
                 lower = lower, upper = upper, method = "L-BFGS-B",
